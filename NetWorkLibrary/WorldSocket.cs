@@ -58,9 +58,10 @@ namespace NetWorkLibrary
         /// </summary>
         public void Open()
         {
-            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}连接……", id, connSocket.RemoteEndPoint);
+            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}连接……", ID, connSocket.RemoteEndPoint);
             readData = new byte[0x2000];
             ReadBuffer = new ByteBuffer();
+            Packets = new Queue<WorldPacket>();
 
             ReadArgs = new SocketAsyncEventArgs();
             ReadArgs.UserToken = this;
@@ -189,7 +190,7 @@ namespace NetWorkLibrary
             if (connSocket == null)
                 return;
 
-            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}断开……", id, connSocket.RemoteEndPoint);
+            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}断开……", ID, connSocket.RemoteEndPoint);
             worldSocketManager.CloseSocket(this);
 
             try

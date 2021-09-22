@@ -21,6 +21,15 @@ namespace NetworkSample
             ReadBuffer.Write(ReadArgs);
         }
 
+        private void PrintHello(byte[] packetData)
+        {
+            ByteBuffer byteBuffer = new ByteBuffer();
+            byteBuffer.Write(packetData);
+            int stringLenth = byteBuffer.ReadInt32();
+            var bytes = byteBuffer.ReadBytes(stringLenth);
+            worldSocketManager.Log(LogType.Message, "收到信息:{0}", Encoding.UTF8.GetString(bytes));
+        }
+
         protected override byte[] BeforeSend(WorldPacket packet)
         {
             return packet.Pack();
@@ -29,6 +38,16 @@ namespace NetworkSample
         protected override void Initialize()
         {
             WorldPacketType = typeof(MyWorldPacket);
+            RegisterHandler(1, PrintHello);
+
+            ByteBuffer byteBuffer = new ByteBuffer();
+            var packet = new MyWorldPacket(byteBuffer);
+            packet.ID = 1;
+            var bytes = Encoding.UTF8.GetBytes(string.Format("这里是客户端{0}.", ID));
+            byteBuffer.Write(bytes.Length);
+            byteBuffer.Write(bytes);
+
+            SendPacket(packet);
         }
     }
 }

@@ -34,6 +34,7 @@ namespace NetWorkLibrary
 
         public bool OpenConnection(int port)
         {
+            LogHead = "server";
             try
             {
                 worldSockets = new Dictionary<int, WorldSocket>();
@@ -126,6 +127,7 @@ namespace NetWorkLibrary
 
         public bool OpenConnection(IPEndPoint serverEndPoint)
         {
+            LogHead = "client";
             ServerEndPoint = serverEndPoint;
             if (connEventArgs == null)
             {
@@ -160,6 +162,8 @@ namespace NetWorkLibrary
 
         #endregion
 
+        public string LogHead = "客户端";
+
         /// <summary>
         /// 日志输出工具
         /// </summary>
@@ -191,13 +195,13 @@ namespace NetWorkLibrary
                 switch (type)
                 {
                     case LogType.Message:
-                        logger.Message(format, args);
+                        logger.Message($"{LogHead}-{format}", args);
                         break;
                     case LogType.Warning:
-                        logger.Warning(format, args);
+                        logger.Warning($"{LogHead}-{format}", args);
                         break;
                     case LogType.Error:
-                        logger.Error(format, args);
+                        logger.Error($"{LogHead}-{format}", args);
                         break;
                 }
             }
