@@ -141,6 +141,12 @@ namespace NetWorkLibrary
         /// </summary>
         protected abstract void Initialize();
 
+        /// <summary>
+        /// in this function, you need put recv data to ReadBuffer.
+        /// 必须将收到的数据存入ReadBuffer变量中.
+        /// 如果你不知道怎么写,请务必添加下面的代码
+        /// ReadBuffer.Write(ReadArgs);
+        /// </summary>
         protected abstract void BeforeRead();
 
         protected abstract byte[] BeforeSend(WorldPacket packet);
