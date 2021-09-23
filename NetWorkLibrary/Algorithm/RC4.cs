@@ -25,7 +25,7 @@ namespace NetWorkLibrary.Algorithm
 
         private void EncrytInitizlize(byte[] key)
         {
-            state = Enumerable.Range(0, 255).Select(i => (byte)i).ToArray();
+            state = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
             for (int i = 0, j = 0; i < 256; i++)
             {
