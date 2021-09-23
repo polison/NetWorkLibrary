@@ -19,6 +19,13 @@ namespace NetWorkLibrary
             wpos = 0;
             rpos = 0;
         }
+        public ByteBuffer(byte[] data)
+        {
+            buffer = new List<byte>();
+            wpos = 0;
+            rpos = 0;
+            Write(data);
+        }
 
         public byte[] GetBytes()
         {
