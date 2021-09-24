@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace NetworkSample
 {
-    public class MyWorldSocket : NetWorkLibrary.WorldSocket
+    public class MyWorldSocket : WorldSocket
     {
-        public MyWorldSocket(Socket linkSocket, WorldSocketManager socketManager)
-            : base(linkSocket, socketManager)
+        public MyWorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
+            : base(packetType, linkSocket, socketManager)
         {
 
         }
@@ -27,7 +27,6 @@ namespace NetworkSample
 
         protected override void Initialize()
         {
-            WorldPacketType = typeof(MyWorldPacket);
             RegisterHandler(1, PrintHello);
 
             ByteBuffer byteBuffer = new ByteBuffer();
@@ -38,6 +37,21 @@ namespace NetworkSample
             byteBuffer.Write(bytes);
 
             SendPacket(packet);
+        }
+
+        protected override void BeforeRead()
+        {
+            ReadBuffer.Write(ReadArgs);
+        }
+
+        protected override void HandleUnRegister(int cmdId, byte[] packetData)
+        {
+            worldSocketManager.Log(LogType.Warning, "cmd:0x{0:X2},data:{1}", cmdId, BitConverter.ToString(packetData));
+        }
+
+        protected override byte[] BeforeSend(WorldPacket packet)
+        {
+            return packet.Pack();
         }
     }
 }

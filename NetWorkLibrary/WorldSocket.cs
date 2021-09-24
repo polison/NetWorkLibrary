@@ -40,18 +40,23 @@ namespace NetWorkLibrary
         /// </summary>
         protected WorldSocketManager worldSocketManager;
 
-        public WorldSocket(Socket linkSocket, WorldSocketManager socketManager)
+        public WorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
         {
+            if (!packetType.IsSubclassOf(typeof(WorldPacket)))
+                throw new Exception("you must post a subclass of WorldPacket as argument for packetType.");
+
             connSocket = linkSocket;
             worldSocketManager = socketManager;
+            WorldPacketType = packetType;
 
             id = connSocket.Handle.ToInt32();
         }
 
+
+        private Type WorldPacketType;
         private byte[] readData;
         protected SocketAsyncEventArgs ReadArgs, WriteArgs;
         protected ByteBuffer ReadBuffer;
-        protected Type WorldPacketType;
 
         /// <summary>
         /// 开始连接
@@ -105,11 +110,13 @@ namespace NetWorkLibrary
             if (ReadArgs.BytesTransferred > 0 && ReadArgs.SocketError == SocketError.Success)
             {
                 ReadPacket();
+                if (connSocket != null)
+                {
+                    if (!connSocket.ReceiveAsync(ReadArgs))
+                        ProcessRead();
 
-                if (!connSocket.ReceiveAsync(ReadArgs))
-                    ProcessRead();
-
-                return;
+                    return;
+                }
             }
 
             Close();
@@ -118,7 +125,7 @@ namespace NetWorkLibrary
         protected Queue<WorldPacket> Packets;
         protected bool IsSending = false;
 
-        protected void ProcessSend()
+        private void ProcessSend()
         {
             if (WriteArgs.SocketError == SocketError.Success)
             {
@@ -136,14 +143,28 @@ namespace NetWorkLibrary
         }
 
         /// <summary>
-        /// you must create a typeof worldpacket in this function put it to WorldPacketType
-        /// 初始化，必须为WorldPacketType赋值,还可以在这里实现连接发送数据
+        /// 
         /// </summary>
         protected abstract void Initialize();
 
-        protected virtual void ReadPacket()
+        /// <summary>
+        /// sample code like <code>ReadBuffer.Write(ReadArgs);</code>
+        /// </summary>
+        protected abstract void BeforeRead();
+
+        /// <summary>
+        /// sample code like <code>return packet.Pack();</code>
+        /// </summary>
+        protected abstract void HandleUnRegister(int cmdId, byte[] packetData);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected abstract byte[] BeforeSend(WorldPacket packet);
+
+        private void ReadPacket()
         {
-            ReadBuffer.Write(ReadArgs);
+            BeforeRead();
 
             while (ReadBuffer.GetLength() > sizeof(ushort))
             {
@@ -153,6 +174,8 @@ namespace NetWorkLibrary
                 var packetData = ReadBuffer.ReadBytes(packetLength);
                 if (PacketHandlers.ContainsKey(cmdId))
                     PacketHandlers[cmdId].Invoke(packetData);
+                else
+                    HandleUnRegister(cmdId, packetData);
 
                 ReadBuffer.ClearReaded();
             }
@@ -162,7 +185,7 @@ namespace NetWorkLibrary
         /// May call from multi threads, so we lock self
         /// 发送包
         /// </summary>
-        public virtual void SendPacket(WorldPacket packet)
+        public void SendPacket(WorldPacket packet)
         {
             lock (this)
             {
@@ -174,7 +197,7 @@ namespace NetWorkLibrary
                 }
 
                 IsSending = true;
-                var bytes = packet.Pack();
+                var bytes = BeforeSend(packet);
                 WriteArgs.SetBuffer(bytes, 0, bytes.Length);
                 if (!connSocket.SendAsync(WriteArgs))
                     ProcessSend();

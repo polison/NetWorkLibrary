@@ -85,10 +85,7 @@ namespace NetWorkLibrary
 
         private void OpenSocket(Socket linkSocket)
         {
-            if (worldSocketType == null)
-                return;
-
-            var worldSocket = Activator.CreateInstance(worldSocketType, linkSocket, this) as WorldSocket;
+            var worldSocket = Activator.CreateInstance(worldSocketType, worldPacketType, linkSocket, this) as WorldSocket;
             lock (worldSockets)
             {
                 worldSockets.Add(worldSocket.ID, worldSocket);
@@ -149,7 +146,7 @@ namespace NetWorkLibrary
             var socket = e.ConnectSocket;
             if (socket.Connected)
             {
-                client = Activator.CreateInstance(worldSocketType, socket, this) as WorldSocket;
+                client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as WorldSocket;
                 client.Open();
                 Log(LogType.Message, "网络服务成功启动并已连接！");
             }
@@ -173,12 +170,18 @@ namespace NetWorkLibrary
 
         private Type worldSocketType;
 
-        public WorldSocketManager(Type socketType, ILog log = null)
+        private Type worldPacketType;
+
+        public WorldSocketManager(Type socketType, Type packetType, ILog log = null)
         {
-            if (socketType.IsSubclassOf(typeof(WorldSocket)))
-                worldSocketType = socketType;
-            else
-                worldSocketType = null;
+            if (!socketType.IsSubclassOf(typeof(WorldSocket)))
+                throw new Exception("you must post a subclass of WorldSocket as argument for socketType.");
+
+            if (!packetType.IsSubclassOf(typeof(WorldPacket)))
+                throw new Exception("you must post a subclass of WorldPacket as argument for packetType.");
+
+            worldSocketType = socketType;
+            worldPacketType = packetType;
             logger = log;
         }
 

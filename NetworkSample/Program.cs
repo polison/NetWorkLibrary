@@ -9,10 +9,10 @@ namespace NetworkSample
         static void Main(string[] args)
         {
             Log logger = new Log();
-            WorldSocketManager serverManager = new WorldSocketManager(typeof(MyWorldSocket), logger);
+            WorldSocketManager serverManager = new WorldSocketManager(typeof(MyWorldSocket), typeof(MyWorldPacket), logger);
             serverManager.OpenConnection(2000);
 
-            WorldSocketManager clientManager = new WorldSocketManager(typeof(MyWorldSocket), logger);
+            WorldSocketManager clientManager = new WorldSocketManager(typeof(MyWorldSocket), typeof(MyWorldPacket), logger);
             IPEndPoint server = new IPEndPoint(IPAddress.Loopback, 2000);
             clientManager.OpenConnection(server);
 
