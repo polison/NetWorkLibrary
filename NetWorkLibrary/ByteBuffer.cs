@@ -138,7 +138,7 @@ namespace NetWorkLibrary
             return buffer[rpos++];
         }
 
-        public bool ReadBool()
+        public bool ReadBoolean()
         {
             var result = ReadByte();
             return result == 1 ? true : false;
