@@ -153,12 +153,12 @@ namespace NetWorkLibrary
         protected abstract void BeforeRead();
 
         /// <summary>
-        /// sample code like <code>return packet.Pack();</code>
+        /// 
         /// </summary>
         protected abstract void HandleUnRegister(int cmdId, byte[] packetData);
 
         /// <summary>
-        /// 
+        /// sample code like <code>return packet.Pack();</code>
         /// </summary>
         protected abstract byte[] BeforeSend(WorldPacket packet);
 
