@@ -148,6 +148,11 @@ namespace NetWorkLibrary
         protected abstract void Initialize();
 
         /// <summary>
+        /// 
+        /// </summary>
+        protected abstract void BeforeClose();
+
+        /// <summary>
         /// sample code like <code>ReadBuffer.Write(ReadArgs);</code>
         /// </summary>
         protected abstract void BeforeRead();
@@ -209,6 +214,8 @@ namespace NetWorkLibrary
             if (connSocket == null)
                 return;
 
+            BeforeClose();
+
             worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}断开……", ID, connSocket.RemoteEndPoint);
             worldSocketManager.CloseSocket(this);
 
@@ -221,6 +228,8 @@ namespace NetWorkLibrary
                 connSocket.Close();
             }
 
+            ReadArgs.Dispose();
+            WriteArgs.Dispose();
             connSocket = null;
         }
     }

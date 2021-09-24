@@ -53,5 +53,10 @@ namespace NetworkSample
         {
             return packet.Pack();
         }
+
+        protected override void BeforeClose()
+        {
+            
+        }
     }
 }
