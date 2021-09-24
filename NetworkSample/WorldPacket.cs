@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace NetworkSample
 {
-    class MyWorldPacket : WorldPacket
+    class WorldPacket : BaseWorldPacket
     {
         public int ID = -1;
 
-        public MyWorldPacket(ByteBuffer byteBuffer)
+        public WorldPacket(ByteBuffer byteBuffer)
             : base(byteBuffer)
         {
             

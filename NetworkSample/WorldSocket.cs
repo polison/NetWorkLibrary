@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace NetworkSample
 {
-    public class MyWorldSocket : WorldSocket
+    public class WorldSocket : BaseWorldSocket
     {
-        public MyWorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
+        public WorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
             : base(packetType, linkSocket, socketManager)
         {
 
@@ -30,7 +30,7 @@ namespace NetworkSample
             RegisterHandler(1, PrintHello);
 
             ByteBuffer byteBuffer = new ByteBuffer();
-            var packet = new MyWorldPacket(byteBuffer);
+            var packet = new WorldPacket(byteBuffer);
             packet.ID = 1;
             var bytes = Encoding.UTF8.GetBytes(string.Format("这里是客户端{0}.", ID));
             byteBuffer.WriteInt32(bytes.Length);
@@ -49,7 +49,7 @@ namespace NetworkSample
             worldSocketManager.Log(LogType.Warning, "cmd:0x{0:X2},data:{1}", cmdId, BitConverter.ToString(packetData));
         }
 
-        protected override byte[] BeforeSend(WorldPacket packet)
+        protected override byte[] BeforeSend(BaseWorldPacket packet)
         {
             return packet.Pack();
         }

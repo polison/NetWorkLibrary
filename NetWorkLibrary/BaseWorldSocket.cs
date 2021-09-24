@@ -12,7 +12,7 @@ namespace NetWorkLibrary
     /// </summary>
     public delegate void PacketHandler(byte[] packetData);
 
-    public abstract class WorldSocket
+    public abstract class BaseWorldSocket
     {
         /// <summary>
         /// 当前连接所用id
@@ -40,9 +40,9 @@ namespace NetWorkLibrary
         /// </summary>
         protected WorldSocketManager worldSocketManager;
 
-        public WorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
+        public BaseWorldSocket(Type packetType, Socket linkSocket, WorldSocketManager socketManager)
         {
-            if (!packetType.IsSubclassOf(typeof(WorldPacket)))
+            if (!packetType.IsSubclassOf(typeof(BaseWorldPacket)))
                 throw new Exception("you must post a subclass of WorldPacket as argument for packetType.");
 
             connSocket = linkSocket;
@@ -66,7 +66,7 @@ namespace NetWorkLibrary
             worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}连接……", ID, connSocket.RemoteEndPoint);
             readData = new byte[0x2000];
             ReadBuffer = new ByteBuffer();
-            Packets = new Queue<WorldPacket>();
+            Packets = new Queue<BaseWorldPacket>();
 
             ReadArgs = new SocketAsyncEventArgs();
             ReadArgs.UserToken = this;
@@ -87,7 +87,7 @@ namespace NetWorkLibrary
 
         private void IO_Completed(object sender, SocketAsyncEventArgs args)
         {
-            WorldSocket client = args.UserToken as WorldSocket;
+            BaseWorldSocket client = args.UserToken as BaseWorldSocket;
             lock (client)
             {
                 switch (args.LastOperation)
@@ -122,7 +122,7 @@ namespace NetWorkLibrary
             Close();
         }
 
-        protected Queue<WorldPacket> Packets;
+        protected Queue<BaseWorldPacket> Packets;
         protected bool IsSending = false;
 
         private void ProcessSend()
@@ -160,7 +160,7 @@ namespace NetWorkLibrary
         /// <summary>
         /// sample code like <code>return packet.Pack();</code>
         /// </summary>
-        protected abstract byte[] BeforeSend(WorldPacket packet);
+        protected abstract byte[] BeforeSend(BaseWorldPacket packet);
 
         private void ReadPacket()
         {
@@ -168,7 +168,7 @@ namespace NetWorkLibrary
 
             while (ReadBuffer.GetLength() > sizeof(ushort))
             {
-                WorldPacket worldPacket = Activator.CreateInstance(WorldPacketType, ReadBuffer) as WorldPacket;
+                BaseWorldPacket worldPacket = Activator.CreateInstance(WorldPacketType, ReadBuffer) as BaseWorldPacket;
                 var cmdId = worldPacket.ReadPacketID();
                 var packetLength = worldPacket.ReadPacketLength();
                 var packetData = ReadBuffer.ReadBytes(packetLength);
@@ -185,7 +185,7 @@ namespace NetWorkLibrary
         /// May call from multi threads, so we lock self
         /// 发送包
         /// </summary>
-        public void SendPacket(WorldPacket packet)
+        public void SendPacket(BaseWorldPacket packet)
         {
             lock (this)
             {

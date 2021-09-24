@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace NetWorkLibrary
 {
-    public abstract class WorldPacket
+    public abstract class BaseWorldPacket
     {
         protected ByteBuffer ByteBuffer;
 
-        public WorldPacket(ByteBuffer buffer)
+        public BaseWorldPacket(ByteBuffer buffer)
         {
             ByteBuffer = buffer;
         }

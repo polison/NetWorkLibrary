@@ -15,7 +15,7 @@ namespace NetWorkLibrary
         /// <summary>
         /// 客户端列表，如果是服务端使用这个参数
         /// </summary>
-        private Dictionary<int, WorldSocket> worldSockets;
+        private Dictionary<int, BaseWorldSocket> worldSockets;
 
         /// <summary>
         /// 最大连接数
@@ -37,7 +37,7 @@ namespace NetWorkLibrary
             LogHead = "server";
             try
             {
-                worldSockets = new Dictionary<int, WorldSocket>();
+                worldSockets = new Dictionary<int, BaseWorldSocket>();
                 maxConnection = new Semaphore(maxConnectionNumber, maxConnectionNumber);
 
                 IPEndPoint local = new IPEndPoint(IPAddress.Any, port);
@@ -85,7 +85,7 @@ namespace NetWorkLibrary
 
         private void OpenSocket(Socket linkSocket)
         {
-            var worldSocket = Activator.CreateInstance(worldSocketType, worldPacketType, linkSocket, this) as WorldSocket;
+            var worldSocket = Activator.CreateInstance(worldSocketType, worldPacketType, linkSocket, this) as BaseWorldSocket;
             lock (worldSockets)
             {
                 worldSockets.Add(worldSocket.ID, worldSocket);
@@ -94,7 +94,7 @@ namespace NetWorkLibrary
             worldSocket.Open();
         }
 
-        public void CloseSocket(WorldSocket worldSocket)
+        public void CloseSocket(BaseWorldSocket worldSocket)
         {
             if (worldSockets == null)
                 return;
@@ -113,7 +113,7 @@ namespace NetWorkLibrary
         /// <summary>
         /// 客户端，如果是客户端使用这个
         /// </summary>
-        private WorldSocket client = null;
+        private BaseWorldSocket client = null;
 
         private IPEndPoint ServerEndPoint;
 
@@ -146,7 +146,7 @@ namespace NetWorkLibrary
             var socket = e.ConnectSocket;
             if (socket.Connected)
             {
-                client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as WorldSocket;
+                client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as BaseWorldSocket;
                 client.Open();
                 Log(LogType.Message, "网络服务成功启动并已连接！");
             }
@@ -174,10 +174,10 @@ namespace NetWorkLibrary
 
         public WorldSocketManager(Type socketType, Type packetType, ILog log = null)
         {
-            if (!socketType.IsSubclassOf(typeof(WorldSocket)))
+            if (!socketType.IsSubclassOf(typeof(BaseWorldSocket)))
                 throw new Exception("you must post a subclass of WorldSocket as argument for socketType.");
 
-            if (!packetType.IsSubclassOf(typeof(WorldPacket)))
+            if (!packetType.IsSubclassOf(typeof(BaseWorldPacket)))
                 throw new Exception("you must post a subclass of WorldPacket as argument for packetType.");
 
             worldSocketType = socketType;
