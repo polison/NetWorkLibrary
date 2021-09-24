@@ -30,8 +30,8 @@ namespace NetworkSample
         public override byte[] Pack()
         {
             ByteBuffer buffer = new ByteBuffer();
-            buffer.Write(ID);
-            buffer.Write(ByteBuffer.GetLength());
+            buffer.WriteInt32(ID);
+            buffer.WriteInt32(ByteBuffer.GetLength());
             buffer.Write(ByteBuffer.GetBytes());
             return buffer.GetBytes();
         }
