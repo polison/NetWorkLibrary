@@ -61,63 +61,63 @@ namespace NetWorkLibrary
             wpos += data.Length;
         }
 
-        public void Write(byte value)
+        public void WriteByte(byte value)
         {
             buffer.Add(value);
             wpos++;
         }
 
-        public void Write(bool value)
+        public void WriteBoolean(bool value)
         {
             if (value)
-                Write((byte)1);
+                WriteByte((byte)1);
             else
-                Write((byte)0);
+                WriteByte((byte)0);
         }
 
-        public void Write(ushort value, bool littleEndian = true)
+        public void WriteUInt16(ushort value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(uint value, bool littleEndian = true)
+        public void WriteUInt32(uint value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(ulong value, bool littleEndian = true)
+        public void WriteUInt64(ulong value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(short value, bool littleEndian = true)
+        public void WriteInt16(short value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(int value, bool littleEndian = true)
+        public void WriteInt32(int value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(long value, bool littleEndian = true)
+        public void WriteInt64(long value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(float value, bool littleEndian = true)
+        public void WriteSingle(float value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);
         }
 
-        public void Write(double value, bool littleEndian = true)
+        public void WriteDouble(double value, bool littleEndian = true)
         {
             var bytes = BitConverter.GetBytes(value);
             Write(bytes, littleEndian);

@@ -23,8 +23,8 @@ namespace NetWorkLibrary
         /// <summary>
         /// 消息处理列表
         /// </summary>
-        private Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
-        protected void RegisterHandler(int id, PacketHandler handler)
+        protected Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
+        public void RegisterHandler(int id, PacketHandler handler)
         {
             if (!PacketHandlers.ContainsKey(id))
                 PacketHandlers.Add(id, handler);
@@ -118,7 +118,7 @@ namespace NetWorkLibrary
         protected Queue<WorldPacket> Packets;
         protected bool IsSending = false;
 
-        private void ProcessSend()
+        protected void ProcessSend()
         {
             if (WriteArgs.SocketError == SocketError.Success)
             {
@@ -141,19 +141,9 @@ namespace NetWorkLibrary
         /// </summary>
         protected abstract void Initialize();
 
-        /// <summary>
-        /// in this function, you need put recv data to ReadBuffer.
-        /// 必须将收到的数据存入ReadBuffer变量中.
-        /// 如果你不知道怎么写,请务必添加下面的代码
-        /// ReadBuffer.Write(ReadArgs);
-        /// </summary>
-        protected abstract void BeforeRead();
-
-        protected abstract byte[] BeforeSend(WorldPacket packet);
-
-        protected void ReadPacket()
+        protected virtual void ReadPacket()
         {
-            BeforeRead();
+            ReadBuffer.Write(ReadArgs);
 
             while (ReadBuffer.GetLength() > sizeof(ushort))
             {
@@ -172,7 +162,7 @@ namespace NetWorkLibrary
         /// May call from multi threads, so we lock self
         /// 发送包
         /// </summary>
-        public void SendPacket(WorldPacket packet)
+        public virtual void SendPacket(WorldPacket packet)
         {
             lock (this)
             {
@@ -184,7 +174,7 @@ namespace NetWorkLibrary
                 }
 
                 IsSending = true;
-                var bytes = BeforeSend(packet);
+                var bytes = packet.Pack();
                 WriteArgs.SetBuffer(bytes, 0, bytes.Length);
                 if (!connSocket.SendAsync(WriteArgs))
                     ProcessSend();
