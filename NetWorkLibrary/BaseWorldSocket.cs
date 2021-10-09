@@ -23,8 +23,8 @@ namespace NetWorkLibrary
         /// <summary>
         /// 消息处理列表
         /// </summary>
-        protected Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
-        public void RegisterHandler(int id, PacketHandler handler)
+        protected static Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
+        public static void RegisterHandler(int id, PacketHandler handler)
         {
             if (!PacketHandlers.ContainsKey(id))
                 PacketHandlers.Add(id, handler);

@@ -169,33 +169,33 @@ namespace NetWorkLibrary.Algorithm
             while ((val & 1 << ret) == 0) ret--;
             return ret;
         }
-    }
 
-    class BitStream
-    {
-        private readonly byte[] buffer;
-        public int Offset { get; private set; }
+        class BitStream
+        {
+            private readonly byte[] buffer;
+            public int Offset { get; private set; }
 
-        public BitStream(byte[] buf)
-        {
-            buffer = buf;
-            Offset = 0;
-        }
+            public BitStream(byte[] buf)
+            {
+                buffer = buf;
+                Offset = 0;
+            }
 
-        public void WriteBits(int val, int n)
-        {
-            int off = Offset & 7;
-            int idx = Offset >> 3;
-            uint v = (uint)((ulong)val << 32 - n - off) | (uint)buffer[idx] << 24;
-            for (int i = 0; i < 4; i++)
-                buffer[idx + i] = (byte)(v >> 24 - (i << 3) & 0xFF);
-            Offset += n;
-        }
-        public void Pad()
-        {
-            int pad_length = (8 - (Offset & 7)) & 7;
-            if (pad_length > 0)
-                WriteBits(0, pad_length);
+            public void WriteBits(int val, int n)
+            {
+                int off = Offset & 7;
+                int idx = Offset >> 3;
+                uint v = (uint)((ulong)val << 32 - n - off) | (uint)buffer[idx] << 24;
+                for (int i = 0; i < 4; i++)
+                    buffer[idx + i] = (byte)(v >> 24 - (i << 3) & 0xFF);
+                Offset += n;
+            }
+            public void Pad()
+            {
+                int pad_length = (8 - (Offset & 7)) & 7;
+                if (pad_length > 0)
+                    WriteBits(0, pad_length);
+            }
         }
     }
 }
