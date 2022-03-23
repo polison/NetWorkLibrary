@@ -32,7 +32,7 @@ namespace NetworkSample
             ByteBuffer byteBuffer = new ByteBuffer();
             var packet = new WorldPacket(byteBuffer);
             packet.ID = 1;
-            var bytes = Encoding.UTF8.GetBytes(string.Format("这里是{1}{0}.", ID, worldSocketManager.LogHead));
+            var bytes = Encoding.UTF8.GetBytes(string.Format("这里是{0}{1}.", worldSocketManager.LogHead, ID));
             byteBuffer.WriteInt32(bytes.Length);
             byteBuffer.Write(bytes);
 
