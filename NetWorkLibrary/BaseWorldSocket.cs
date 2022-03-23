@@ -23,8 +23,8 @@ namespace NetWorkLibrary
         /// <summary>
         /// 消息处理列表
         /// </summary>
-        protected static Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
-        public static void RegisterHandler(int id, PacketHandler handler)
+        protected Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
+        public void RegisterHandler(int id, PacketHandler handler)
         {
             if (!PacketHandlers.ContainsKey(id))
                 PacketHandlers.Add(id, handler);
@@ -63,7 +63,7 @@ namespace NetWorkLibrary
         /// </summary>
         public void Open()
         {
-            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}连接……", ID, connSocket.RemoteEndPoint);
+            worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}连接……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
             readData = new byte[0x2000];
             ReadBuffer = new ByteBuffer();
             Packets = new Queue<BaseWorldPacket>();
@@ -216,7 +216,7 @@ namespace NetWorkLibrary
 
             BeforeClose();
 
-            worldSocketManager.Log(LogType.Message, "客户端[{0}]{1}断开……", ID, connSocket.RemoteEndPoint);
+            worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
             worldSocketManager.CloseSocket(this);
 
             try
