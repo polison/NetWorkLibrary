@@ -10,7 +10,7 @@ namespace NetWorkLibrary
     /// <summary>
     /// 消息处理函数
     /// </summary>
-    public delegate void PacketHandler(byte[] packetData);
+    public delegate void PacketHandler(ByteBuffer byteBuffer);
 
     public abstract class BaseWorldSocket
     {
@@ -178,7 +178,11 @@ namespace NetWorkLibrary
                 var packetLength = worldPacket.ReadPacketLength();
                 var packetData = ReadBuffer.ReadBytes(packetLength);
                 if (PacketHandlers.ContainsKey(cmdId))
-                    PacketHandlers[cmdId].Invoke(packetData);
+                {
+                    ByteBuffer byteBuffer = new ByteBuffer();
+                    byteBuffer.Write(packetData);
+                    PacketHandlers[cmdId].Invoke(byteBuffer);
+                }
                 else
                     HandleUnRegister(cmdId, packetData);
 
