@@ -10,7 +10,7 @@ namespace NetWorkLibrary
     /// <summary>
     /// 消息处理函数
     /// </summary>
-    public delegate void PacketHandler(byte[] packetData);
+    public delegate void PacketHandler(ByteBuffer byteBuffer);
 
     public abstract class BaseWorldSocket
     {
@@ -79,10 +79,10 @@ namespace NetWorkLibrary
 
             ReadArgs.Completed += IO_Completed;
             WriteArgs.Completed += IO_Completed;
-            if (!connSocket.ReceiveAsync(ReadArgs))
-                ProcessRead();
 
             Initialize();
+            if (!connSocket.ReceiveAsync(ReadArgs))
+                ProcessRead();
         }
 
         private void IO_Completed(object sender, SocketAsyncEventArgs args)
@@ -178,7 +178,11 @@ namespace NetWorkLibrary
                 var packetLength = worldPacket.ReadPacketLength();
                 var packetData = ReadBuffer.ReadBytes(packetLength);
                 if (PacketHandlers.ContainsKey(cmdId))
-                    PacketHandlers[cmdId].Invoke(packetData);
+                {
+                    ByteBuffer byteBuffer = new ByteBuffer();
+                    byteBuffer.Write(packetData);
+                    PacketHandlers[cmdId].Invoke(byteBuffer);
+                }
                 else
                     HandleUnRegister(cmdId, packetData);
 
@@ -211,26 +215,29 @@ namespace NetWorkLibrary
 
         public void Close()
         {
-            if (connSocket == null)
-                return;
-
-            BeforeClose();
-
-            worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
-            worldSocketManager.CloseSocket(this);
-
-            try
+            lock(this)
             {
-                connSocket.Shutdown(SocketShutdown.Both);
-            }
-            catch
-            {
-                connSocket.Close();
-            }
+                if (connSocket == null)
+                    return;
 
-            ReadArgs.Dispose();
-            WriteArgs.Dispose();
-            connSocket = null;
+                BeforeClose();
+
+                worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
+                worldSocketManager.CloseSocket(this);
+
+                try
+                {
+                    connSocket.Shutdown(SocketShutdown.Both);
+                }
+                catch
+                {
+                    connSocket.Close();
+                }
+
+                ReadArgs.Dispose();
+                WriteArgs.Dispose();
+                connSocket = null;
+            }
         }
     }
 }

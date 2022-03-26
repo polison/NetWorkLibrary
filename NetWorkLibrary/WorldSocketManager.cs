@@ -145,17 +145,34 @@ namespace NetWorkLibrary
 
         private void ProcessConnect(object sender, SocketAsyncEventArgs e)
         {
-            var socket = e.ConnectSocket;
-            if (socket.Connected)
+            switch (e.SocketError)
             {
-                client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as BaseWorldSocket;
-                client.Open();
-                Log(LogType.Message, "网络服务成功启动并已连接！");
-            }
-            else
-            {
-                OpenConnection(ServerEndPoint);
-                Log(LogType.Warning, "网络服务成功启动但未能连接，正在重连……");
+                case SocketError.Success:
+                    {
+                        var socket = e.ConnectSocket;
+                        if (socket.Connected)
+                        {
+                            client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as BaseWorldSocket;
+                            client.Open();
+                            Log(LogType.Message, "网络服务成功启动并已连接！");
+                        }
+                        else
+                        {
+                            OpenConnection(ServerEndPoint);
+                            Log(LogType.Warning, "网络服务成功启动但未能连接，正在重连……");
+                        }
+                    }
+                    break;
+                case SocketError.AccessDenied:
+                case SocketError.OperationAborted:
+                    Log(LogType.Warning, "网络服务已经关闭……");
+                    break;
+                default:
+                    {
+                        OpenConnection(ServerEndPoint);
+                        Log(LogType.Error, "网络服务未能连接，正在重连……");
+                    }
+                    break;
             }
         }
 

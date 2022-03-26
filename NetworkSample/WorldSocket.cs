@@ -16,10 +16,10 @@ namespace NetworkSample
 
         }
 
-        private void PrintHello(byte[] packetData)
+        private void PrintHello(ByteBuffer byteBuffer)
         {
-            ByteBuffer byteBuffer = new ByteBuffer();
-            byteBuffer.Write(packetData);
+            //ByteBuffer byteBuffer = new ByteBuffer();
+            //byteBuffer.Write(packetData);
             int stringLenth = byteBuffer.ReadInt32();
             var bytes = byteBuffer.ReadBytes(stringLenth);
             worldSocketManager.Log(LogType.Message, "收到信息:{0}", Encoding.UTF8.GetString(bytes));
