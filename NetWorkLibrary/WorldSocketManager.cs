@@ -15,7 +15,7 @@ namespace NetWorkLibrary
         /// <summary>
         /// 客户端列表，如果是服务端使用这个参数
         /// </summary>
-        private Dictionary<int, BaseWorldSocket> worldSockets;
+        private Dictionary<long, BaseWorldSocket> worldSockets;
 
         /// <summary>
         /// 最大连接数
@@ -32,13 +32,40 @@ namespace NetWorkLibrary
         /// </summary>
         private Semaphore maxConnection;
 
+        /// <summary>
+        /// 获取客户端列表
+        /// </summary>
+        public Dictionary<long, BaseWorldSocket> GetWorldSockets()
+        {
+            return worldSockets;
+        }
+
+        /// <summary>
+        /// 发送广播
+        /// </summary>
+        public void BroadCast(BaseWorldPacket packet)
+        {
+            lock(worldSockets)
+            {
+                foreach (var socket in worldSockets.Values)
+                {
+                    socket.SendPacket(packet);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 开启服务(服务端)
+        /// </summary>
+        /// <param name="port">服务端口</param>
+        /// <returns>是否成功</returns>
         public bool OpenConnection(int port)
         {
             LogHead = "服务端(server)";
             TargetHead = "客户端(client)";
             try
             {
-                worldSockets = new Dictionary<int, BaseWorldSocket>();
+                worldSockets = new Dictionary<long, BaseWorldSocket>();
                 maxConnection = new Semaphore(maxConnectionNumber, maxConnectionNumber);
 
                 IPEndPoint local = new IPEndPoint(IPAddress.Any, port);
@@ -74,6 +101,7 @@ namespace NetWorkLibrary
                     ProcessAccept(null, args);
             }
         }
+
         private void ProcessAccept(object sender, SocketAsyncEventArgs eventArgs)
         {
             var socket = eventArgs.AcceptSocket;
@@ -95,14 +123,14 @@ namespace NetWorkLibrary
             worldSocket.Open();
         }
 
-        public void CloseSocket(BaseWorldSocket worldSocket)
+        internal void CloseSocket(long clientID)
         {
             if (worldSockets == null)
                 return;
 
             lock (worldSockets)
             {
-                worldSockets.Remove(worldSocket.ID);
+                worldSockets.Remove(clientID);
                 maxConnection.Release();
             }
         }
@@ -123,7 +151,11 @@ namespace NetWorkLibrary
         /// </summary>
         private SocketAsyncEventArgs connEventArgs = null;
 
-        public bool OpenConnection(IPEndPoint serverEndPoint)
+        /// <summary>
+        /// 开启服务(客户端)
+        /// </summary>
+        /// <param name="serverEndPoint">服务器地址</param>
+        public void OpenConnection(IPEndPoint serverEndPoint)
         {
             LogHead = "客户端(client)";
             TargetHead = "服务端(server)";
@@ -139,8 +171,6 @@ namespace NetWorkLibrary
 
             if (!connSocket.ConnectAsync(connEventArgs))
                 ProcessConnect(null, connEventArgs);
-
-            return true;
         }
 
         private void ProcessConnect(object sender, SocketAsyncEventArgs e)
@@ -192,6 +222,9 @@ namespace NetWorkLibrary
 
         private Type worldPacketType;
 
+        public Dictionary<long, BaseWorldSocket> WorldSockets { get => worldSockets; set => worldSockets = value; }
+        public Dictionary<long, BaseWorldSocket> WorldSockets1 { get => worldSockets; set => worldSockets = value; }
+
         public WorldSocketManager(Type socketType, Type packetType, ILog log = null)
         {
             if (!socketType.IsSubclassOf(typeof(BaseWorldSocket)))
@@ -230,6 +263,9 @@ namespace NetWorkLibrary
             }
         }
 
+        /// <summary>
+        /// 关闭服务
+        /// </summary>
         public void CloseConnection()
         {
             if (connSocket != null)

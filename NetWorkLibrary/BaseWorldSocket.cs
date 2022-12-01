@@ -17,8 +17,8 @@ namespace NetWorkLibrary
         /// <summary>
         /// 当前连接所用id
         /// </summary>
-        private readonly int id;
-        public int ID => id;
+        private readonly long id;
+        public long ID => id;
 
         /// <summary>
         /// 消息处理列表
@@ -49,7 +49,7 @@ namespace NetWorkLibrary
             worldSocketManager = socketManager;
             WorldPacketType = packetType;
 
-            id = connSocket.Handle.ToInt32();
+            id = connSocket.Handle.ToInt64();
         }
 
 
@@ -213,6 +213,9 @@ namespace NetWorkLibrary
             }
         }
 
+        /// <summary>
+        /// 关闭
+        /// </summary>
         public void Close()
         {
             lock(this)
@@ -223,7 +226,7 @@ namespace NetWorkLibrary
                 BeforeClose();
 
                 worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
-                worldSocketManager.CloseSocket(this);
+                worldSocketManager.CloseSocket(id);
 
                 try
                 {
