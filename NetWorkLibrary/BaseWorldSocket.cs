@@ -10,7 +10,7 @@ namespace NetWorkLibrary
     /// <summary>
     /// 消息处理函数
     /// </summary>
-    public delegate void PacketHandler(ByteBuffer byteBuffer);
+    public delegate void PacketHandler(BaseWorldSocket socket, ByteBuffer byteBuffer);
 
     public abstract class BaseWorldSocket
     {
@@ -23,8 +23,8 @@ namespace NetWorkLibrary
         /// <summary>
         /// 消息处理列表
         /// </summary>
-        protected Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
-        public void RegisterHandler(int id, PacketHandler handler)
+        protected static Dictionary<int, PacketHandler> PacketHandlers = new Dictionary<int, PacketHandler>();
+        public static void RegisterHandler(int id, PacketHandler handler)
         {
             if (!PacketHandlers.ContainsKey(id))
                 PacketHandlers.Add(id, handler);
@@ -34,6 +34,7 @@ namespace NetWorkLibrary
         /// 连接用Socket
         /// </summary>
         protected Socket connSocket;
+        public Socket Socket => connSocket;
 
         /// <summary>
         /// socket管理器
@@ -181,7 +182,7 @@ namespace NetWorkLibrary
                 {
                     ByteBuffer byteBuffer = new ByteBuffer();
                     byteBuffer.Write(packetData);
-                    PacketHandlers[cmdId].Invoke(byteBuffer);
+                    PacketHandlers[cmdId].Invoke(this, byteBuffer);
                 }
                 else
                     HandleUnRegister(cmdId, packetData);

@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\NetworkSample.csproj": {}
+    "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\ServerSample.csproj": {}
   },
   "projects": {
     "E:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary\\NetWorkLibrary.csproj": {
@@ -63,12 +63,12 @@
         }
       }
     },
-    "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\NetworkSample.csproj": {
+    "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\ServerSample.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\NetworkSample.csproj",
-        "projectName": "NetworkSample",
-        "projectPath": "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\NetworkSample.csproj",
+        "projectUniqueName": "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\ServerSample.csproj",
+        "projectName": "ServerSample",
+        "projectPath": "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\ServerSample.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
         "outputPath": "E:\\VSProjects\\NetWorkLibrary\\NetworkSample\\obj\\",
         "projectStyle": "PackageReference",

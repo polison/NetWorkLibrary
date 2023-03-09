@@ -182,9 +182,9 @@ namespace NetWorkLibrary
                         var socket = e.ConnectSocket;
                         if (socket.Connected)
                         {
+                            Log(LogType.Message, "网络服务成功启动并已连接！");
                             client = Activator.CreateInstance(worldSocketType, worldPacketType, socket, this) as BaseWorldSocket;
                             client.Open();
-                            Log(LogType.Message, "网络服务成功启动并已连接！");
                         }
                         else
                         {
