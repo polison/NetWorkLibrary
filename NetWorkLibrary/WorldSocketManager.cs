@@ -143,6 +143,7 @@ namespace NetWorkLibrary
         /// 客户端，如果是客户端使用这个
         /// </summary>
         private BaseWorldSocket client = null;
+        public BaseWorldSocket Client => client;
 
         private IPEndPoint ServerEndPoint;
 
@@ -223,7 +224,6 @@ namespace NetWorkLibrary
         private Type worldPacketType;
 
         public Dictionary<long, BaseWorldSocket> WorldSockets { get => worldSockets; set => worldSockets = value; }
-        public Dictionary<long, BaseWorldSocket> WorldSockets1 { get => worldSockets; set => worldSockets = value; }
 
         public WorldSocketManager(Type socketType, Type packetType, ILog log = null)
         {
