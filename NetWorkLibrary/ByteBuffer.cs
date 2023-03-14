@@ -40,8 +40,10 @@ namespace NetWorkLibrary
         public void ClearReaded()
         {
             buffer.RemoveRange(0, rpos);
-            rpos = 0;
             wpos -= rpos;
+            if (wpos < 0)
+                wpos = 0;
+            rpos = 0;
         }
 
         public void Write(SocketAsyncEventArgs args, RC4 encrypt = null)
@@ -123,6 +125,13 @@ namespace NetWorkLibrary
             Write(bytes, littleEndian);
         }
 
+        public void WriteString(string value)
+        {
+            var bytes = Encoding.UTF8.GetBytes(value);
+            WriteInt32(bytes.Length);
+            Write(bytes);
+        }
+
         public byte[] ReadBytes(int length, bool littleEndian = true)
         {
             var result = new byte[length];
@@ -190,6 +199,14 @@ namespace NetWorkLibrary
         {
             var bytes = ReadBytes(8, littleEndian);
             return BitConverter.ToDouble(bytes);
+        }
+
+        public string ReadString()
+        {
+            int stringLenth = ReadInt32();
+            var bytes = ReadBytes(stringLenth);
+            string result = Encoding.UTF8.GetString(bytes);
+            return result;
         }
     }
 }
