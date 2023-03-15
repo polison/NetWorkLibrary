@@ -110,13 +110,22 @@ namespace NetWorkLibrary
         {
             if (ReadArgs.BytesTransferred > 0 && ReadArgs.SocketError == SocketError.Success)
             {
-                ReadPacket();
-                if (connSocket != null)
+                try
                 {
-                    if (!connSocket.ReceiveAsync(ReadArgs))
-                        ProcessRead();
+                    ReadPacket();
 
-                    return;
+                    if (connSocket != null)
+                    {
+                        if (!connSocket.ReceiveAsync(ReadArgs))
+                            ProcessRead();
+
+                        return;
+                    }
+                }
+                catch(Exception e)
+                {
+                    worldSocketManager.Log(LogType.Error, e.Message);
+                    Close();
                 }
             }
 
