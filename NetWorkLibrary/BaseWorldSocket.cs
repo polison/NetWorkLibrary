@@ -235,16 +235,17 @@ namespace NetWorkLibrary
 
                 BeforeClose();
 
-                worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
-                worldSocketManager.CloseSocket(id);
-
                 try
                 {
+                    worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
+                    worldSocketManager.CloseSocket(id);
+               
                     connSocket.Shutdown(SocketShutdown.Both);
                 }
                 catch
                 {
-                    connSocket.Close();
+                    if (connSocket != null)
+                        connSocket.Close();
                 }
 
                 ReadArgs.Dispose();

@@ -79,7 +79,7 @@ namespace NetWorkLibrary
                 return false;
             }
 
-            Log(LogType.Message, "网络服务成功启动！");
+            Log(LogType.Message, "网络服务[{0}:{1}]成功启动！", IPAddress.Any.ToString(), port);
             DoAccept(null);
             return true;
         }
