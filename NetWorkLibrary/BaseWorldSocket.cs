@@ -145,11 +145,7 @@ namespace NetWorkLibrary
                     if (Packets.Count > 0)
                         SendPacket(Packets.Dequeue());
                 }
-
-                return;
             }
-
-            Close();
         }
 
         /// <summary>
@@ -206,21 +202,18 @@ namespace NetWorkLibrary
         /// </summary>
         public void SendPacket(BaseWorldPacket packet)
         {
-            lock (this)
+            if (IsSending)
             {
-                if (IsSending)
-                {
-                    lock (Packets)
-                        Packets.Enqueue(packet);
-                    return;
-                }
-
-                IsSending = true;
-                var bytes = BeforeSend(packet);
-                WriteArgs.SetBuffer(bytes, 0, bytes.Length);
-                if (!connSocket.SendAsync(WriteArgs))
-                    ProcessSend();
+                lock (Packets)
+                    Packets.Enqueue(packet);
+                return;
             }
+
+            IsSending = true;
+            var bytes = BeforeSend(packet);
+            WriteArgs.SetBuffer(bytes, 0, bytes.Length);
+            if (!connSocket.SendAsync(WriteArgs))
+                ProcessSend();
         }
 
         /// <summary>
@@ -228,30 +221,27 @@ namespace NetWorkLibrary
         /// </summary>
         public void Close()
         {
-            lock(this)
+            if (connSocket == null)
+                return;
+
+            BeforeClose();
+
+            try
             {
-                if (connSocket == null)
-                    return;
+                worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
+                worldSocketManager.CloseSocket(id);
 
-                BeforeClose();
-
-                try
-                {
-                    worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
-                    worldSocketManager.CloseSocket(id);
-               
-                    connSocket.Shutdown(SocketShutdown.Both);
-                }
-                catch
-                {
-                    if (connSocket != null)
-                        connSocket.Close();
-                }
-
-                ReadArgs.Dispose();
-                WriteArgs.Dispose();
-                connSocket = null;
+                connSocket.Shutdown(SocketShutdown.Both);
             }
+            catch
+            {
+                if (connSocket != null)
+                    connSocket.Close();
+            }
+
+            ReadArgs.Dispose();
+            WriteArgs.Dispose();
+            connSocket = null;
         }
     }
 }
