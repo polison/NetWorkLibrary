@@ -1,8 +1,10 @@
 ﻿using NetWorkLibrary.Algorithm;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NetWorkLibrary
 {
@@ -41,6 +43,11 @@ namespace NetWorkLibrary
             wpos -= rpos;
             if (wpos < 0)
                 wpos = 0;
+            rpos = 0;
+        }
+
+        public void ResetRead()
+        {
             rpos = 0;
         }
 
@@ -165,49 +172,49 @@ namespace NetWorkLibrary
         public ushort ReadUInt16(bool littleEndian = true)
         {
             var bytes = ReadBytes(2, littleEndian);
-            return BitConverter.ToUInt16(bytes, 0);
+            return BitConverter.ToUInt16(bytes);
         }
 
         public uint ReadUInt32(bool littleEndian = true)
         {
             var bytes = ReadBytes(4, littleEndian);
-            return BitConverter.ToUInt32(bytes, 0);
+            return BitConverter.ToUInt32(bytes);
         }
 
         public ulong ReadUInt64(bool littleEndian = true)
         {
             var bytes = ReadBytes(8, littleEndian);
-            return BitConverter.ToUInt64(bytes, 0);
+            return BitConverter.ToUInt64(bytes);
         }
 
         public short ReadInt16(bool littleEndian = true)
         {
             var bytes = ReadBytes(2, littleEndian);
-            return BitConverter.ToInt16(bytes, 0);
+            return BitConverter.ToInt16(bytes);
         }
 
         public int ReadInt32(bool littleEndian = true)
         {
             var bytes = ReadBytes(4, littleEndian);
-            return BitConverter.ToInt32(bytes, 0);
+            return BitConverter.ToInt32(bytes);
         }
 
         public long ReadInt64(bool littleEndian = true)
         {
             var bytes = ReadBytes(8, littleEndian);
-            return BitConverter.ToInt64(bytes, 0);
+            return BitConverter.ToInt64(bytes);
         }
 
         public float ReadSingle(bool littleEndian = true)
         {
             var bytes = ReadBytes(4, littleEndian);
-            return BitConverter.ToSingle(bytes, 0);
+            return BitConverter.ToSingle(bytes);
         }
 
         public double ReadDouble(bool littleEndian = true)
         {
             var bytes = ReadBytes(8, littleEndian);
-            return BitConverter.ToDouble(bytes, 0);
+            return BitConverter.ToDouble(bytes);
         }
 
         public string ReadString()

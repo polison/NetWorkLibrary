@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace NetWorkLibrary
 {
@@ -119,9 +122,10 @@ namespace NetWorkLibrary
                         return;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     worldSocketManager.Log(LogType.Error, e.Message);
+                    worldSocketManager.Log(LogType.Error, e.StackTrace);
                     Close();
                 }
             }
@@ -142,11 +146,7 @@ namespace NetWorkLibrary
                     if (Packets.Count > 0)
                         SendPacket(Packets.Dequeue());
                 }
-
-                return;
             }
-
-            Close();
         }
 
         /// <summary>
@@ -178,11 +178,14 @@ namespace NetWorkLibrary
         {
             BeforeRead();
 
-            while (ReadBuffer.GetLength() > sizeof(ushort))
+            while (ReadBuffer.GetLength() >= sizeof(int) * 2)
             {
                 BaseWorldPacket worldPacket = Activator.CreateInstance(WorldPacketType, ReadBuffer) as BaseWorldPacket;
                 var cmdId = worldPacket.ReadPacketID();
                 var packetLength = worldPacket.ReadPacketLength();
+                if (packetLength + 2 * sizeof(int) > ReadBuffer.GetLength())
+                    break;
+
                 var packetData = ReadBuffer.ReadBytes(packetLength);
                 if (PacketHandlers.ContainsKey(cmdId))
                 {
@@ -203,21 +206,18 @@ namespace NetWorkLibrary
         /// </summary>
         public void SendPacket(BaseWorldPacket packet)
         {
-            lock (this)
+            if (IsSending)
             {
-                if (IsSending)
-                {
-                    lock (Packets)
-                        Packets.Enqueue(packet);
-                    return;
-                }
-
-                IsSending = true;
-                var bytes = BeforeSend(packet);
-                WriteArgs.SetBuffer(bytes, 0, bytes.Length);
-                if (!connSocket.SendAsync(WriteArgs))
-                    ProcessSend();
+                lock (Packets)
+                    Packets.Enqueue(packet);
+                return;
             }
+
+            IsSending = true;
+            var bytes = BeforeSend(packet);
+            WriteArgs.SetBuffer(bytes, 0, bytes.Length);
+            if (!connSocket.SendAsync(WriteArgs))
+                ProcessSend();
         }
 
         /// <summary>
@@ -225,29 +225,35 @@ namespace NetWorkLibrary
         /// </summary>
         public void Close()
         {
-            lock(this)
+            if (connSocket == null)
+                return;
+
+            BeforeClose();
+
+            try
             {
-                if (connSocket == null)
-                    return;
-
-                BeforeClose();
-
                 worldSocketManager.Log(LogType.Message, "{0}[{1}]{2}断开……", worldSocketManager.TargetHead, ID, connSocket.RemoteEndPoint);
                 worldSocketManager.CloseSocket(id);
 
-                try
-                {
-                    connSocket.Shutdown(SocketShutdown.Both);
-                }
-                catch
-                {
-                    connSocket.Close();
-                }
-
-                ReadArgs.Dispose();
-                WriteArgs.Dispose();
-                connSocket = null;
+                connSocket.Shutdown(SocketShutdown.Both);
             }
+            catch
+            {
+                if (connSocket != null)
+                    connSocket.Close();
+            }
+
+            ReadArgs.Dispose();
+            WriteArgs.Dispose();
+            connSocket = null;
+        }
+
+        /// <summary>
+        /// 输入日志
+        /// </summary>
+        public void Log(LogType type, string format, params object[] args)
+        {
+            worldSocketManager.Log(type, format, args);
         }
     }
 }
