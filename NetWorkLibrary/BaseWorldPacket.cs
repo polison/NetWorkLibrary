@@ -13,6 +13,7 @@ namespace NetWorkLibrary
         public BaseWorldPacket(ByteBuffer buffer)
         {
             ByteBuffer = buffer;
+            ByteBuffer.ResetRead();
         }
 
         public abstract byte[] Pack();

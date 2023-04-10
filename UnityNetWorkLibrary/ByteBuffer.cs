@@ -61,6 +61,17 @@ namespace NetWorkLibrary
             wpos += data.Length;
         }
 
+        public void Write(byte[] data, int dataLength, bool littleEndian = true)
+        {
+            byte[] newData = new byte[dataLength];
+            Array.Copy(data, 0, newData, 0, dataLength);
+
+            if (!littleEndian)
+                Array.Reverse(newData);
+            buffer.AddRange(newData);
+            wpos += dataLength;
+        }
+
         public void WriteByte(byte value)
         {
             buffer.Add(value);
@@ -154,7 +165,7 @@ namespace NetWorkLibrary
         public ushort ReadUInt16(bool littleEndian = true)
         {
             var bytes = ReadBytes(2, littleEndian);
-            return BitConverter.ToUInt16(bytes,0);
+            return BitConverter.ToUInt16(bytes, 0);
         }
 
         public uint ReadUInt32(bool littleEndian = true)

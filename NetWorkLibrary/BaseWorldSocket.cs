@@ -122,9 +122,10 @@ namespace NetWorkLibrary
                         return;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     worldSocketManager.Log(LogType.Error, e.Message);
+                    worldSocketManager.Log(LogType.Error, e.StackTrace);
                     Close();
                 }
             }
@@ -177,11 +178,14 @@ namespace NetWorkLibrary
         {
             BeforeRead();
 
-            while (ReadBuffer.GetLength() > sizeof(ushort))
+            while (ReadBuffer.GetLength() >= sizeof(int) * 2)
             {
                 BaseWorldPacket worldPacket = Activator.CreateInstance(WorldPacketType, ReadBuffer) as BaseWorldPacket;
                 var cmdId = worldPacket.ReadPacketID();
                 var packetLength = worldPacket.ReadPacketLength();
+                if (packetLength + 2 * sizeof(int) > ReadBuffer.GetLength())
+                    break;
+
                 var packetData = ReadBuffer.ReadBytes(packetLength);
                 if (PacketHandlers.ContainsKey(cmdId))
                 {
@@ -242,6 +246,14 @@ namespace NetWorkLibrary
             ReadArgs.Dispose();
             WriteArgs.Dispose();
             connSocket = null;
+        }
+
+        /// <summary>
+        /// 输入日志
+        /// </summary>
+        public void Log(LogType type, string format, params object[] args)
+        {
+            worldSocketManager.Log(type, format, args);
         }
     }
 }

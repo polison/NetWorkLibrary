@@ -46,6 +46,11 @@ namespace NetWorkLibrary
             rpos = 0;
         }
 
+        public void ResetRead()
+        {
+            rpos = 0;
+        }
+
         public void Write(SocketAsyncEventArgs args, RC4 encrypt = null)
         {
             var bytes = new byte[args.BytesTransferred];
