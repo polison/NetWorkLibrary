@@ -95,7 +95,7 @@ namespace NetWorkLibrary
             maxConnection.WaitOne();
             if (connSocket != null)
             {
-                if (connSocket.AcceptAsync(args))
+                if (!connSocket.AcceptAsync(args))
                     ProcessAccept(null, args);
             }
         }
@@ -103,7 +103,7 @@ namespace NetWorkLibrary
         private void ProcessAccept(object sender, SocketAsyncEventArgs eventArgs)
         {
             var socket = eventArgs.AcceptSocket;
-            if (socket.Connected)
+            if (socket!=null && socket.Connected)
             {
                 OpenSocket(socket);
                 DoAccept(eventArgs); //把当前异步事件释放，等待下次连接
