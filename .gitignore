@@ -4,3 +4,5 @@
 
 /.vs
 /bin/Release
+/obj/Debug
+/obj/Release
