@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Description>C#异步网络框架，加入了mysql数据库支持、MPPC压缩算法的加密解密，RC4对等加密。</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="True" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MySql.Data" Version="9.0.0" />
+    </ItemGroup>
+
+</Project>
