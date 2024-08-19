@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("C#异步网络框架，加入了mysql数据库支持、MPPC压缩算法的加密解密，RC4对等加密。")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc701d198987b869a03b4b0b9071e3d6c2e2f07b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+683c04dd62d6c76775653db260aa13ef9f26dff8")]
 [assembly: System.Reflection.AssemblyProductAttribute("NetWorkLibrary")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NetWorkLibrary")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
