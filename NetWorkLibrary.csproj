@@ -12,7 +12,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MySql.Data" Version="9.0.0" />
+      <Reference Include="MySql.Data">
+        <HintPath>Database\MySql.Data.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Database\MySql.Data.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

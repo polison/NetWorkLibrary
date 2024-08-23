@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj": {}
+    "D:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj": {}
   },
   "projects": {
-    "E:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj": {
+    "D:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj",
+        "projectUniqueName": "D:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj",
         "projectName": "NetWorkLibrary",
-        "projectPath": "E:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj",
+        "projectPath": "D:\\VSProjects\\NetWorkLibrary\\NetWorkLibrary.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "E:\\VSProjects\\NetWorkLibrary\\obj\\",
+        "outputPath": "D:\\VSProjects\\NetWorkLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,7 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "G:\\mynuget": {},
+          "D:\\VSProjects\\NetWorkLibrary\\bin\\Release": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -49,12 +49,6 @@
       "frameworks": {
         "netstandard2.1": {
           "targetAlias": "netstandard2.1",
-          "dependencies": {
-            "MySql.Data": {
-              "target": "Package",
-              "version": "[9.0.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -71,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
