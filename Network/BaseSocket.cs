@@ -215,7 +215,7 @@ namespace NetWorkLibrary.Network
             Dispose();
         }
 
-        public virtual void ProcessPacket(SocketAsyncEventArgs args)
+        protected virtual void ProcessPacket(SocketAsyncEventArgs args)
         {
             ReadBuffer.Write(args);
 
