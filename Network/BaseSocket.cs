@@ -176,8 +176,7 @@ namespace NetWorkLibrary.Network
                     .Where(x => x.IsSubclassOf(typeof(PacketHandler<TBasePacket>)));
                 foreach (var t in typs)
                 {
-                    if (t.IsSubclassOf(typeof(PacketHandler<TBasePacket>)))
-                        Activator.CreateInstance(t, true);
+                    Activator.CreateInstance(t, true);
                 }
                 Registered = true;
             }
