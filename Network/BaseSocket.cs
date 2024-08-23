@@ -1,6 +1,7 @@
 ﻿using NetWorkLibrary.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -170,15 +171,13 @@ namespace NetWorkLibrary.Network
         {
             if (!Registered)
             {
-                var abs = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var a in abs)
+                var typs = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
+                    .Where(x => x.IsSubclassOf(typeof(PacketHandler<TBasePacket>)));
+                foreach (var t in typs)
                 {
-                    var typs = a.GetTypes();
-                    foreach (var t in typs)
-                    {
-                        if (t.IsSubclassOf(typeof(PacketHandler<TBasePacket>)))
-                            Activator.CreateInstance(t, true);
-                    }
+                    if (t.IsSubclassOf(typeof(PacketHandler<TBasePacket>)))
+                        Activator.CreateInstance(t, true);
                 }
                 Registered = true;
             }
