@@ -78,6 +78,11 @@ namespace NetWorkLibrary.Utility
             wpos++;
         }
 
+        public void WriteInt8(sbyte value)
+        {
+            WriteByte((byte)value);
+        }
+
         public void WriteByte(byte value)
         {
             buffer.Add(value);
@@ -158,6 +163,13 @@ namespace NetWorkLibrary.Utility
         {
             var value = ReadByte();
             return value == 1;
+        }
+
+        public sbyte ReadInt8()
+        {
+            var value = buffer[rpos];
+            rpos++;
+            return (sbyte)value;
         }
 
         public byte ReadByte()
