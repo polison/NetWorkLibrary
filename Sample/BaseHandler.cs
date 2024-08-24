@@ -2,7 +2,7 @@
 
 namespace NetWorkLibrary.Sample
 {
-    public class BaseHandler : PacketHandler<WorldPacket>
+    public abstract class BaseHandler : PacketHandler<WorldPacket>
     {
     }
 }

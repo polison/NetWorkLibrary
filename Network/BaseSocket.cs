@@ -62,8 +62,6 @@ namespace NetWorkLibrary.Network
 
     public abstract class BaseSocket<TBasePacket> : ISocket, IDisposable where TBasePacket : IPacket
     {
-        private readonly int buffSize = 0x4000;
-
         private Socket linkSocket;
 
         private IPEndPoint linkIP;
@@ -71,6 +69,8 @@ namespace NetWorkLibrary.Network
         private SocketAsyncEventArgs readArgs;
 
         protected ByteBuffer ReadBuffer;
+
+        protected readonly int MaxBuffSize = 0x4000;
 
         protected BaseSocket(Socket socket)
         {
@@ -81,7 +81,7 @@ namespace NetWorkLibrary.Network
 
             ReadBuffer = new ByteBuffer();
             readArgs = new SocketAsyncEventArgs();
-            readArgs.SetBuffer(new byte[buffSize], 0, buffSize);
+            readArgs.SetBuffer(new byte[MaxBuffSize], 0, MaxBuffSize);
             readArgs.Completed += (sender, args) => { ProcessReadAsync(args); };
 
             ProcessRead();
@@ -173,7 +173,7 @@ namespace NetWorkLibrary.Network
             {
                 var typs = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
-                    .Where(x => x.IsSubclassOf(typeof(PacketHandler<TBasePacket>)));
+                    .Where(x => x.IsSubclassOf(typeof(PacketHandler<TBasePacket>)) && !x.IsAbstract);
                 foreach (var t in typs)
                 {
                     Activator.CreateInstance(t, true);
@@ -205,7 +205,7 @@ namespace NetWorkLibrary.Network
             if (!IsOpen())
                 return;
 
-            readArgs.SetBuffer(0, buffSize);
+            readArgs.SetBuffer(0, MaxBuffSize);
             if (!linkSocket.ReceiveAsync(readArgs))
                 ProcessReadAsync(readArgs);
         }
@@ -228,7 +228,7 @@ namespace NetWorkLibrary.Network
                     uint cmd = packet.GetOpcode(buffer);
                     uint length = packet.GetLength(buffer);
 
-                    if (buffSize < length)
+                    if (MaxBuffSize < length)
                     {
                         LogManager.Instance.Log(LogType.Warning, $"[{linkIP}] send to larger packet[{cmd}] with length[{length}], closed.");
                         Close();
