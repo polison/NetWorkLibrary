@@ -9,6 +9,11 @@ namespace NetWorkLibrary.Database
 
         public int ColumnCount { get; set; }
 
+        public MysqlDataRow Read(int row)
+        {
+            return new MysqlDataRow(Rows[row]);
+        }
+
         public T Read<T>(int row, string columnName)
         {
             return (T)Convert.ChangeType(Rows[row][columnName], typeof(T));
