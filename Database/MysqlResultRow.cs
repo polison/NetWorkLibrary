@@ -12,6 +12,16 @@ namespace NetWorkLibrary.Database
             DataRow = Row;
         }
 
+        public bool IsNull(string columnName)
+        {
+            return DataRow.IsNull(columnName);
+        }
+
+        public bool IsNull(int column)
+        {
+            return DataRow.IsNull(column);
+        }
+
         public T Read<T>(string columnName)
         {
             if (DataRow.IsNull(columnName))
