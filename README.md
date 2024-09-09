@@ -77,9 +77,7 @@ public class WorldSocket : BaseSocket<WorldPacket>
 #一个包处理PacketHandler<IPacket>的子类作为所有包处理函数注册的父类
 
 ```
-public class BaseHandler : PacketHandler<WorldPacket>
-{
-}
+public abstract class BaseHandler : PacketHandler<WorldPacket>;
 ```
 
 #一个启动示例:

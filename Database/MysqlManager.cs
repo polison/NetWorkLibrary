@@ -23,7 +23,7 @@ namespace NetWorkLibrary.Database
             {
                 connection.Open();
                 asyncConnection.Open();
-                LogManager.Instance.Log(LogType.Message, "Successfully connected to {0}:{1}:{2}", host, port, database);
+                LogManager.Instance.Log(LogType.Message, "Mysql Successfully connected to {0}:{1}:{2}", host, port, database);
             }
             catch (MySqlException e)
             {

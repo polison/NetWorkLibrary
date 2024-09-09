@@ -39,6 +39,11 @@ namespace NetWorkLibrary.Utility
             Write(byteBuffer.Data);
         }
 
+        public void ResetRead()
+        {
+            rpos = 0;
+        }
+
         public void RemoveRead(int length = 0)
         {
             int remove = length == 0 ? rpos : length;

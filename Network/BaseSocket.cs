@@ -221,12 +221,11 @@ namespace NetWorkLibrary.Network
 
             while (ReadBuffer.Length > sizeof(uint))
             {
-                var buffer = new ByteBuffer(ReadBuffer);
                 try
                 {
                     TBasePacket packet = Activator.CreateInstance<TBasePacket>();
-                    uint cmd = packet.GetOpcode(buffer);
-                    uint length = packet.GetLength(buffer);
+                    uint cmd = packet.GetOpcode(ReadBuffer);
+                    uint length = packet.GetLength(ReadBuffer);
 
                     if (MaxBuffSize < length)
                     {
@@ -235,22 +234,26 @@ namespace NetWorkLibrary.Network
                         return;
                     }
 
-                    if (buffer.Length < length)
+                    if (ReadBuffer.Length < length)
+                    {
+                        ReadBuffer.ResetRead();
                         return;
+                    }
 
+                    var bytes = ReadBuffer.ReadBytes((int)length);
                     if (Handlers.ContainsKey(cmd))
                     {
+                        ByteBuffer buffer = new ByteBuffer(bytes);
                         Handlers[cmd].Invoke(this, buffer);
                     }
                     else
                     {
-                        buffer.ReadBytes((int)length);
                         LogManager.Instance.Log(LogType.Warning, $"[{linkIP}] send unknown packet[{cmd}] with length[{length}].");
                     }
                 }
                 catch { }
 
-                ReadBuffer.RemoveRead(buffer.ReadPosition);
+                ReadBuffer.RemoveRead();
             }
         }
 
