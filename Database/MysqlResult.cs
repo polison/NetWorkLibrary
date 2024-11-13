@@ -16,12 +16,14 @@ namespace NetWorkLibrary.Database
 
         public T Read<T>(int row, string columnName)
         {
-            return (T)Convert.ChangeType(Rows[row][columnName], typeof(T));
+            MysqlDataRow datarow = Read(row);
+            return datarow.Read<T>(columnName);
         }
 
         public T Read<T>(int row, int column)
         {
-            return (T)Convert.ChangeType(Rows[row][column], typeof(T));
+            MysqlDataRow datarow = Read(row);
+            return datarow.Read<T>(column);
         }
     }
 }
