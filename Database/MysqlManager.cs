@@ -15,7 +15,7 @@ namespace NetWorkLibrary.Database
         MySqlConnection asyncConnection;
         public void Init(string host, string user, string password, string database, int port)
         {
-            string connStr = $"data source={host};database={database};user id={user};password={password};pooling=true;charset=utf8;";
+            string connStr = $"data source={host};database={database};user id={user};password={password};pooling=true;charset=utf8;SslMode=None;";
             connection = new MySqlConnection(connStr);
             asyncConnection = new MySqlConnection(connStr);
 
