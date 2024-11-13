@@ -32,15 +32,15 @@ namespace NetWorkLibrary.Database
             }
         }
 
-        public bool Execute(string procedureName, string[] paramNames, object[] paramValues)
+        public bool Execute(string sql, string[] paramNames, object[] paramValues)
         {
             if (paramNames.Length != paramValues.Length)
             {
-                LogManager.Instance.Log(LogType.Warning, "Execute {0} Error: param is not equal.", procedureName);
+                LogManager.Instance.Log(LogType.Warning, "Execute {0} Error: param is not equal.", sql);
                 return false;
             }
 
-            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
             for (int i = 0; i < paramNames.Length; i++)
             {
                 cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
@@ -56,22 +56,26 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
-                LogManager.Instance.Log(LogType.Error, "Execute {0} Error: {1}.", procedureName, e.Message);
+                LogManager.Instance.Log(LogType.Error, "Execute {0} MysqlError: {1}.", sql, e.Message);
+            }
+            catch (Exception e)
+            {
+                LogManager.Instance.Log(LogType.Error, "Execute {0} Error: {1}.", sql, e.Message);
             }
 
             return false;
         }
 
-        public MysqlResult Query(string procedureName, string[] paramNames, object[] paramValues)
+        public MysqlResult Query(string sql, string[] paramNames, object[] paramValues)
         {
             MysqlResult result = new MysqlResult();
             if (paramNames.Length != paramValues.Length)
             {
-                LogManager.Instance.Log(LogType.Warning, "Query {0} Error: param is not equal.", procedureName);
+                LogManager.Instance.Log(LogType.Warning, "Query {0} Error: param is not equal.", sql);
                 return result;
             }
 
-            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
             for (int i = 0; i < paramNames.Length; i++)
             {
                 cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
@@ -90,7 +94,11 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
-                LogManager.Instance.Log(LogType.Error, "Query {0} Error: {1}.", procedureName, e.Message);
+                LogManager.Instance.Log(LogType.Error, "Query {0} MysqlError: {1}.", sql, e.Message);
+            }
+            catch (Exception e)
+            {
+                LogManager.Instance.Log(LogType.Error, "Query {0} Error: {1}.", sql, e.Message);
             }
 
             return result;
@@ -129,6 +137,10 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
+                LogManager.Instance.Log(LogType.Error, "QueryAysnc {0} MysqlError: {1}.", sql, e.Message);
+            }
+            catch (Exception e)
+            {
                 LogManager.Instance.Log(LogType.Error, "QueryAysnc {0} Error: {1}.", sql, e.Message);
             }
         }
@@ -159,6 +171,10 @@ namespace NetWorkLibrary.Database
                 return true;
             }
             catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PExecute {0} MysqlError: {1}.", procedureName, e.Message);
+            }
+            catch (Exception e)
             {
                 LogManager.Instance.Log(LogType.Error, "PExecute {0} Error: {1}.", procedureName, e.Message);
             }
@@ -194,6 +210,10 @@ namespace NetWorkLibrary.Database
                 result.ColumnCount = result.Columns.Count;
             }
             catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PQuery {0} MysqlError: {1}.", procedureName, e.Message);
+            }
+            catch (Exception e)
             {
                 LogManager.Instance.Log(LogType.Error, "PQuery {0} Error: {1}.", procedureName, e.Message);
             }
@@ -234,6 +254,10 @@ namespace NetWorkLibrary.Database
                 CallBack(result);
             }
             catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PQueryAysnc {0} MysqlError: {1}.", procedureName, e.Message);
+            }
+            catch (Exception e)
             {
                 LogManager.Instance.Log(LogType.Error, "PQueryAysnc {0} Error: {1}.", procedureName, e.Message);
             }
