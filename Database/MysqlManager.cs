@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using NetWorkLibrary.Utility;
 using System;
 using System.Data;
@@ -31,12 +32,19 @@ namespace NetWorkLibrary.Database
             }
         }
 
-        public bool Execute(string sql, params object[] args)
+        public bool Execute(string procedureName, string[] paramNames, object[] paramValues)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.GetCultureInfo("en-US").NumberFormat, sql, args);
-            var slqStr = sb.ToString();
-            MySqlCommand cmd = new MySqlCommand(slqStr, connection);
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "Execute {0} Error: param is not equal.", procedureName);
+                return false;
+            }
+
+            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
 
             try
             {
@@ -48,19 +56,26 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
-                LogManager.Instance.Log(LogType.Error, "Execute {0} Error: {1}.", slqStr, e.Message);
+                LogManager.Instance.Log(LogType.Error, "Execute {0} Error: {1}.", procedureName, e.Message);
             }
+
             return false;
         }
 
-        public MysqlResult Query(string sql, params object[] args)
+        public MysqlResult Query(string procedureName, string[] paramNames, object[] paramValues)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.GetCultureInfo("en-US").NumberFormat, sql, args);
-
             MysqlResult result = new MysqlResult();
-            var slqStr = sb.ToString();
-            MySqlCommand cmd = new MySqlCommand(slqStr, connection);
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "Query {0} Error: param is not equal.", procedureName);
+                return result;
+            }
+
+            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
 
             try
             {
@@ -75,26 +90,32 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
-                LogManager.Instance.Log(LogType.Error, "Select {0} Error: {1}.", slqStr, e.Message);
+                LogManager.Instance.Log(LogType.Error, "Query {0} Error: {1}.", procedureName, e.Message);
             }
 
             return result;
         }
 
-        public async void QueryAysnc(Action<MysqlResult> CallBack, string sql, params object[] args)
+        public async void QueryAysnc(Action<MysqlResult> CallBack, string sql, string[] paramNames, object[] paramValues)
         {
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "QueryAysnc {0} Error: param is not equal.", sql);
+                return;
+            }
+
             while (isQuerying)
             {
                 await Task.Delay(10);
             }
             isQuerying = true;
 
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.GetCultureInfo("en-US").NumberFormat, sql, args);
-
             MysqlResult result = new MysqlResult();
-            var slqStr = sb.ToString();
-            MySqlCommand cmd = new MySqlCommand(slqStr, asyncConnection);
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
 
             try
             {
@@ -108,9 +129,116 @@ namespace NetWorkLibrary.Database
             }
             catch (MySqlException e)
             {
-                LogManager.Instance.Log(LogType.Error, "Async Select {0} Error: {1}.", slqStr, e.Message);
+                LogManager.Instance.Log(LogType.Error, "QueryAysnc {0} Error: {1}.", sql, e.Message);
             }
         }
+
+        #region 存储过程查询
+
+        public bool PExecute(string procedureName, string[] paramNames, object[] paramValues)
+        {
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "PExecute {0} Error: param is not equal.", procedureName);
+                return false;
+            }
+
+            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
+
+            try
+            {
+                lock (connection)
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                return true;
+            }
+            catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PExecute {0} Error: {1}.", procedureName, e.Message);
+            }
+
+            return false;
+        }
+
+        public MysqlResult PQuery(string procedureName, string[] paramNames, object[] paramValues)
+        {
+            MysqlResult result = new MysqlResult();
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "PQuery {0} Error: param is not equal.", procedureName);
+                return result;
+            }
+
+            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
+
+            try
+            {
+                lock (connection)
+                {
+                    var reader = cmd.ExecuteReader(CommandBehavior.Default);
+                    result.Load(reader);
+                    reader.Close();
+                }
+                result.RowCount = result.Rows.Count;
+                result.ColumnCount = result.Columns.Count;
+            }
+            catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PQuery {0} Error: {1}.", procedureName, e.Message);
+            }
+
+            return result;
+        }
+
+        public async void PQueryAysnc(Action<MysqlResult> CallBack, string procedureName, string[] paramNames, object[] paramValues)
+        {
+            if (paramNames.Length != paramValues.Length)
+            {
+                LogManager.Instance.Log(LogType.Warning, "PQueryAysnc {0} Error: param is not equal.", procedureName);
+                return;
+            }
+
+            while (isQuerying)
+            {
+                await Task.Delay(10);
+            }
+            isQuerying = true;
+
+            MysqlResult result = new MysqlResult();
+            MySqlCommand cmd = new MySqlCommand(procedureName, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            for (int i = 0; i < paramNames.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(paramNames[i], paramValues[i]);
+            }
+
+            try
+            {
+                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.Default);
+                result.Load(reader);
+                reader.Close();
+                isQuerying = false;
+                result.RowCount = result.Rows.Count;
+                result.ColumnCount = result.Columns.Count;
+                CallBack(result);
+            }
+            catch (MySqlException e)
+            {
+                LogManager.Instance.Log(LogType.Error, "PQueryAysnc {0} Error: {1}.", procedureName, e.Message);
+            }
+        }
+        #endregion //存储过程查询
 
         public void Dispose()
         {
