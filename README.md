@@ -141,7 +141,8 @@ private void OnPing(AuthSocket socket, PingPacket packet)
 [projectname].[version] 替换为包名 例如我的是NetWorkLibrary.1.0.3<br>
 
 [username] 替换为自己的名字<br>
-[APIKey] 替换为自己的APIKey
+[APIKey] 替换为自己的APIKey<br>
+ghp-Wk0jbt5rrNy2BJhpise1SQJJoTMLix4btQdO0
 ```
 dotnet nuget add source --username [username] --password [APIKey] --store-password-in-clear-text --name github "https://nuget.pkg.github.com/[username]/index.json"
 
